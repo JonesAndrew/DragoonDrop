@@ -241,6 +241,10 @@ public class GameObject : BaseObject
         return _gameplay.GetGameObjects(MapPosition + new Vector2(x, y));
     }
 
+    public virtual void Killed(GameObject target)
+    {
+    }
+
     public void GetAttacked(GameObject by, int damage)
     {
         if (Health == null)
@@ -249,9 +253,5 @@ public class GameObject : BaseObject
         Health.Amount -= damage;
         if (Health.Amount <= 0)
             by.Killed(this);
-    }
-
-    virtual public void Killed(GameObject object)
-    {
     }
 }

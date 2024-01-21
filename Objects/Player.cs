@@ -44,7 +44,7 @@ public class Player : GameObject
         base.Draw(gameTime);
     }
 
-    public override void Killed(GameObject object)
+    public override void Killed(GameObject target)
     {
         _handManager.DrawCards(HandManager.MAX_CARDS);
     }
