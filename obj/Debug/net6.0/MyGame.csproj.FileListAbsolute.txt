@@ -25,3 +25,4 @@
 /Users/andrewjones/MyGame/obj/Debug/net6.0/ref/MyGame.dll
 /Users/andrewjones/MyGame/bin/Debug/net6.0/MonoGame.Extended.dll
 /Users/andrewjones/MyGame/bin/Debug/net6.0/Newtonsoft.Json.dll
+/Users/andrewjones/MyGame/obj/Debug/net6.0/MyGame.sourcelink.json

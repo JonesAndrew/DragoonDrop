@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using MonoGame.Extended.Collections;
+using MonoGame.Extended.BitmapFonts;
 
 namespace MyGame;
 
@@ -17,6 +18,7 @@ public class HandManager : BaseObject
     private List<Card> _discard;
 
     int hovering = -1;
+    int selected = -1;
 
     public const int MAX_CARDS = 7;
 
@@ -43,9 +45,13 @@ public class HandManager : BaseObject
 
             if (_deck.Count == 0)
                 Shuffle();
+
+            if (_deck.Count == 0)
+                break;
             
             var card = _deck[0];
             _hand.Add((card, new Vector2(0, 0)));
+            _deck.RemoveAt(0);
         }
     }
 
@@ -73,14 +79,39 @@ public class HandManager : BaseObject
             _hand[i] = (_hand[i].card, new Vector2(320 - 32 - _hand.Count/2 * 32 + i * 64, target) * (float)0.1 + _hand[i].position * (float)0.9);
         }
 
+        Selected();
+        Hovering();
+    }
+
+    public void Hovering()
+    {
         if (hovering == -1)
             return;
 
         if (_gameplay.CurrentFrame.MouseState.LeftButton == ButtonState.Pressed && _gameplay.LastFrame.MouseState.LeftButton != ButtonState.Pressed)
         {
-            _hand[hovering].card.Cast(_gameplay.Player, new Vector2(1, 0));
-            _hand.RemoveAt(hovering);
-            _gameplay.Player.CastedCard = true;
+            selected = hovering;
+        }
+    }
+
+    public void Selected()
+    {
+        if (selected == -1)
+            return;
+
+        var mp = new Vector2(_gameplay.CurrentFrame.MouseState.X, _gameplay.CurrentFrame.MouseState.Y);
+        _hand[selected] = (_hand[selected].card, mp);
+
+        if (_gameplay.CurrentFrame.MouseState.LeftButton == ButtonState.Pressed && _gameplay.LastFrame.MouseState.LeftButton != ButtonState.Pressed)
+        {
+            if (mp.Y > 220) selected = -1;
+            else
+            {
+                _hand[selected].card.Cast(_gameplay.Player, new Vector2(mp.X < _gameplay.Player.Position.X ? -1 : 1, 0));
+                _hand.RemoveAt(selected);
+                _gameplay.Player.CastedCard = true;
+                selected = -1;
+            }
         }
     }
 
@@ -91,6 +122,9 @@ public class HandManager : BaseObject
             var c = _hand[i];
             _cardSprite.Position =  c.position;
             _cardSprite.Draw(gameTime);
+
+            _gameplay.Game.SpriteBatch.DrawString(_gameplay.Game.Font, c.card.GetType().Name, new Vector2((int)c.position.X + 12, (int)c.position.Y - 1), Color.Black);
+            _gameplay.Game.SpriteBatch.DrawString(_gameplay.Game.Font, c.card.Description, new Vector2((int)c.position.X + 12, (int)c.position.Y + 10), Color.Black);
         }
     }
 }

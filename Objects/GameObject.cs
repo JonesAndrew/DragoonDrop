@@ -66,6 +66,13 @@ public class GameAction
         }, null);
     }
 
+    public static GameAction WaitFor(Func<bool> waiting)
+    {
+        return new GameAction(null, () => {
+            return waiting();
+        }, null);
+    }
+
     public static GameAction Check(Func<bool> check, Action hot, Action cold)
     {
         return new GameAction(() => {
@@ -102,16 +109,18 @@ public class GameAction
 
     public static GameAction Move(GameObject target, Vector2 amount)
     {
-        int frame = 0;
         Vector2 targetPosition = new Vector2(0, 0);
         return new GameAction(() => {
             int i = 1;
             while (i <= Math.Abs(amount.Y) || i <= Math.Abs(amount.X)) {
                 if (Math.Abs(amount.Y) >= i && target.CanMove(0, Math.Sign(amount.Y)))
+                {
                     target.MapPosition += new Vector2(0, Math.Sign(amount.Y));
+                    if (amount.Y < 0)
+                        target.MovedUp = true;
+                }
                 if (Math.Abs(amount.X) >= i && target.CanMove(Math.Sign(amount.X), 0))
                     target.MapPosition += new Vector2(Math.Sign(amount.X), 0);
-                
                 i += 1;
             }
             targetPosition = target.MapPosition * 32;
@@ -141,11 +150,23 @@ public class GameAction
             }
             else
             {
+                var objects = target.GetGameObjects(0, 0);
+                foreach (GameObject obj in objects)
+                {
+                    if (obj != target)
+                    {
+                        target.Collided?.Invoke(obj);
+                        obj.Collided?.Invoke(obj);
+                    }
+                }
                 return done;
             }
         }, null);
     }
 }
+
+public delegate void TurnStarted();
+public delegate void Collided(GameObject target);
 
 public class GameObject : BaseObject
 {
@@ -153,13 +174,21 @@ public class GameObject : BaseObject
     public Vector2 Position { get; set; }
     public int Facing { get; set; }
     public Health Health { get; set; } = null;
+    public bool Gravity { get; set; } = true;
+    public bool Physical { get; set; } = true;
+    public bool MovedUp { get; set; } = false;
 
     private List<GameAction> _actions = new List<GameAction>();
-    private Gameplay _gameplay;
+    public Gameplay Gameplay { get; set; }
+
+    public TurnStarted TurnStarted;
+    public Collided Collided;
+
+    private bool _remove = false;
 
     public GameObject(Gameplay gameplay)
     {
-        _gameplay = gameplay;
+        Gameplay = gameplay;
         Facing = 1;
     }
 
@@ -201,11 +230,16 @@ public class GameObject : BaseObject
 
     public virtual void StartTurn()
     {
+        TurnStarted?.Invoke();
     }
 
     public virtual void EndTurn()
     {
-        AddAction(GameAction.Move(this, new Vector2(0, 1)));
+        if (MovedUp)
+        {
+            MovedUp = false;
+        }
+        else if (Gravity) AddAction(GameAction.Move(this, new Vector2(0, 1)));
     }
 
     // public bool CanMove(Vector2 target)
@@ -215,11 +249,19 @@ public class GameObject : BaseObject
 
     public bool StandingOnGround()
     {
-        return !_gameplay.MoveableSpace(MapPosition + new Vector2(0, 1));
+        return !Gameplay.MoveableSpace(MapPosition + new Vector2(0, 1));
+    }
+
+    public void Remove()
+    {
+        _remove = true;
     }
 
     public bool ShouldRemove()
     {
+        if (_remove)
+            return _remove;
+
         if (Health == null)
             return false;
         
@@ -228,17 +270,17 @@ public class GameObject : BaseObject
 
     public bool CanMove(int x, int y)
     {
-        return _gameplay.MoveableSpace(MapPosition + new Vector2(x, y));
+        return !Physical || Gameplay.MoveableSpace(MapPosition + new Vector2(x, y));
     }
 
     public bool IsPlayer(int x, int y)
     {
-        return _gameplay.Player.MapPosition == MapPosition + new Vector2(x, y);
+        return Gameplay.Player.MapPosition == MapPosition + new Vector2(x, y);
     }
 
     public IEnumerable<GameObject> GetGameObjects(int x, int y)
     {
-        return _gameplay.GetGameObjects(MapPosition + new Vector2(x, y));
+        return Gameplay.GetGameObjects(MapPosition + new Vector2(x, y));
     }
 
     public virtual void Killed(GameObject target)

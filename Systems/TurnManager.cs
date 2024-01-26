@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System;
 
 namespace MyGame;
 
@@ -64,7 +65,10 @@ class TurnManager
     {
         if (_gameplay.GameObjectsDone())
         {
-            _gameplay.Enemies((e) => e.StartTurn());
+            _gameplay.Enemies((e) => {
+                Console.WriteLine(e);
+                e.StartTurn();
+            });
             _state = TurnState.RunningEnemies;
         }   
     }
@@ -74,7 +78,7 @@ class TurnManager
         if (_gameplay.GameObjectsDone())
         {
             _gameplay.Enemies((e) => e.EndTurn());
-            _state = TurnState.RunningEnvironment;
+            _state = TurnState.EndingEnemies;
         }
     }
 

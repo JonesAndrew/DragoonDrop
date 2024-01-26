@@ -28,6 +28,7 @@ public class Gameplay : GameScreen
     private List<GameObject> _gameObjects = new List<GameObject>();
     private List<GameObject> _enemies = new List<GameObject>();
     private List<GameObject> _envs = new List<GameObject>();
+    private List<Action> _inserts = new List<Action>();
 
     public InputState LastFrame { get; set; } = new InputState();
     public InputState CurrentFrame { get; set; } = new InputState();
@@ -51,22 +52,54 @@ public class Gameplay : GameScreen
         });
 
         _turnManager = new TurnManager(this);
-        _handManager = new HandManager(this, new List<Card> { new SideStep(), new SideStep(), new SideStep(), new SideStep(), new SideStep(), new SideStep(), new SideStep(), new SideStep(), new SideStep()});
+        _handManager = new HandManager(this, new List<Card> { 
+            new Knock(), 
+            new Knock(), 
+            new Lunge(), 
+            new Lunge(), 
+            new SideStep(), 
+            new SideStep(), 
+            new SideStep(), 
+            new SideStep(),
+            new Dragoon(),
+            new Dragoon(),
+        });
         Player = new Player(this, _handManager);
         Player.SetMapPosition(new Vector2(1, 3));
         _gameObjects.Add(Player);
         _objects.Add(Player);  
 
-        var walker = new Walker(this);
-        walker.SetMapPosition(new Vector2(4, 3));
+        GameObject walker = new KnifeThrower(this);
+        walker.SetMapPosition(new Vector2(6, 3));
         AddEnemy(walker);
+
+        walker = new Walker(this);
+        walker.SetMapPosition(new Vector2(7, 3));
+        AddEnemy(walker);
+        
+    }
+
+    public void AddEnemiesFront(GameObject go)
+    {
+        _inserts.Add(() => {
+            _enemies.Insert(0, go);
+            _gameObjects.Add(go);
+            _objects.Add(go);
+        });
     }
 
     public void AddEnemy(GameObject go)
     {
-        _enemies.Add(go);
-        _gameObjects.Add(go);
-        _objects.Add(go);
+        _inserts.Add(() => {
+            _enemies.Add(go);
+            _gameObjects.Add(go);
+            _objects.Add(go);
+        });
+    }
+
+    public void RemoveBase(BaseObject go)
+    {
+        _objects.Remove(go);
     }
 
     public void Remove(GameObject go)
@@ -80,6 +113,11 @@ public class Gameplay : GameScreen
     public IEnumerable<GameObject> GetGameObjects(Vector2 target)
     {
         return _gameObjects.Where((go) => go.MapPosition == target);
+    }
+
+    public bool IsWall(Vector2 target)
+    {
+        return _map.GetCollision((int)target.X, (int)target.Y);
     }
 
     public bool MoveableSpace(Vector2 target)
@@ -116,11 +154,41 @@ public class Gameplay : GameScreen
         _turnManager.Update();
 
         foreach (var o in _objects) o.Update(gameTime);
+        foreach (var i in _inserts) i();
+        _inserts.Clear();
         for (int i = 0; i < _gameObjects.Count; i++)
         {
             if (_gameObjects[i].ShouldRemove())
                 Remove(_gameObjects[i]);
         }
+    }
+
+    public List<Vector2> DrawLineNoDiagonalSteps(int x0, int y0, int x1, int y1) {
+        int dx =  Math.Abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+        int dy = -Math.Abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+        int err = dx + dy, e2;
+
+        var items = new List<Vector2>();
+
+        for (;;) {
+            items.Add(new Vector2(x0, y0));
+            Console.WriteLine("" + x0 + " " + y0);
+
+            if (x0 == x1 && y0 == y1) break;
+
+            e2 = 2 * err;
+
+            // EITHER horizontal OR vertical step (but not both!)
+            if (e2 > dy) { 
+                err += dy;
+                x0 += sx;
+            } else if (e2 < dx) { // <--- this "else" makes the difference
+                err += dx;
+                y0 += sy;
+            }
+        }
+
+        return items;
     }
 
     public override void Draw(GameTime gameTime)
