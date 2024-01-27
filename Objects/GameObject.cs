@@ -107,20 +107,34 @@ public class GameAction
         }, null, null);
     }
 
-    public static GameAction Move(GameObject target, Vector2 amount)
+    public static GameAction Move(GameObject target, Vector2 amount, Func<Vector2, bool> onMove)
     {
         Vector2 targetPosition = new Vector2(0, 0);
         return new GameAction(() => {
             int i = 1;
             while (i <= Math.Abs(amount.Y) || i <= Math.Abs(amount.X)) {
-                if (Math.Abs(amount.Y) >= i && target.CanMove(0, Math.Sign(amount.Y)))
+                if (Math.Abs(amount.Y) >= i)
                 {
-                    target.MapPosition += new Vector2(0, Math.Sign(amount.Y));
-                    if (amount.Y < 0)
-                        target.MovedUp = true;
+                    if (onMove != null && onMove(target.MapPosition + new Vector2(0, Math.Sign(amount.Y))))
+                        break;
+
+                    if (target.CanMove(0, Math.Sign(amount.Y)))
+                    {
+                        target.MapPosition += new Vector2(0, Math.Sign(amount.Y));
+                        if (amount.Y < 0)
+                            target.MovedUp = true;
+                    }
                 }
-                if (Math.Abs(amount.X) >= i && target.CanMove(Math.Sign(amount.X), 0))
-                    target.MapPosition += new Vector2(Math.Sign(amount.X), 0);
+                if (Math.Abs(amount.X) >= i)
+                {
+                    if (onMove != null && onMove(target.MapPosition + new Vector2(Math.Sign(amount.X), 0)))
+                        break;
+
+                    if (target.CanMove(Math.Sign(amount.X), 0))
+                    {
+                        target.MapPosition += new Vector2(Math.Sign(amount.X), 0);
+                    }
+                }
                 i += 1;
             }
             targetPosition = target.MapPosition * 32;
@@ -205,7 +219,7 @@ public class GameObject : BaseObject
         _actions.Add(a);
     }
 
-    public override void Update(GameTime gameTime)
+    public void RunActions()
     {
         while (_actions.Count > 0)
         {
@@ -218,6 +232,11 @@ public class GameObject : BaseObject
                 break;
             }
         }
+    }
+
+    public override void Update(GameTime gameTime)
+    {
+        RunActions();
     }
 
     public override void Draw(GameTime gameTime)
@@ -239,7 +258,7 @@ public class GameObject : BaseObject
         {
             MovedUp = false;
         }
-        else if (Gravity) AddAction(GameAction.Move(this, new Vector2(0, 1)));
+        else if (Gravity) AddAction(GameAction.Move(this, new Vector2(0, 1), null));
     }
 
     // public bool CanMove(Vector2 target)

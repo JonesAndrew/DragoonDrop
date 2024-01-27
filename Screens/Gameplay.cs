@@ -63,6 +63,9 @@ public class Gameplay : GameScreen
             new SideStep(),
             new Dragoon(),
             new Dragoon(),
+            new DragonKick(),
+            new DragonKick(),
+            new DragonKick(),
         });
         Player = new Player(this, _handManager);
         Player.SetMapPosition(new Vector2(1, 3));

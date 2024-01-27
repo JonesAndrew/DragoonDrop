@@ -36,7 +36,12 @@ public abstract class Card
 
     public void Move(Vector2 amount)
     {
-        _caster.AddAction(GameAction.Move(_caster, amount));
+        _caster.AddAction(GameAction.Move(_caster, amount, null));
+    }
+
+    public void Move(Vector2 amount, Func<Vector2, bool> onMove)
+    {
+        _caster.AddAction(GameAction.Move(_caster, amount, onMove));
     }
 
     public void Check(Func<bool> check, Action hot, Action cold)
@@ -105,5 +110,38 @@ public class SideStep : Card
     {
         Move(new Vector2(direction.X, 0));
         Draw(1);
+    }
+}
+
+public class DragonKick : Card
+{
+    public override void OnCast(GameObject caster, Vector2 direction)
+    {
+        Check(() => caster.StandingOnGround(), () => {
+            Move(new Vector2(direction.X * 3, 0), (spot) => {
+                foreach (var obj in caster.Gameplay.GetGameObjects(spot))
+                {
+                    For(obj, () => {
+                        Move(new Vector2(direction.X, -1));
+                        obj.RunActions();
+                    });
+                }
+
+                return false;
+            });
+        }, () => {
+            Move(new Vector2(direction.X * 3, 3), (spot) => {
+                bool done = false;
+                foreach (var obj in caster.Gameplay.GetGameObjects(spot))
+                {
+                    For(obj, () => {
+                        Move(new Vector2(0, 1));
+                        obj.RunActions();
+                    });
+                    done = true;
+                }
+                return done;
+            });
+        });
     }
 }
