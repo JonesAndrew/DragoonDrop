@@ -15,6 +15,13 @@ public class BatCard : Card
             var player = caster.Gameplay.Player;
             Check(() => Math.Abs(player.MapPosition.X - caster.MapPosition.X) <= 2 && Math.Abs(player.MapPosition.Y - caster.MapPosition.Y) <= 3, () => {
                 var dif = player.MapPosition - caster.MapPosition;
+
+                var spr = new Sprite(caster.Gameplay.Game.SpriteBatch, SpriteLoader.Get("enemy_tiles"), 32, 32, 10);
+                var s = new SpriteObject(spr);
+                spr.Frame = 7;
+                spr.Position = player.MapPosition * 32;
+                caster.Gameplay.AddObject(s);
+
                 NextTurn(() => {
                     var objs = caster.Gameplay.GetGameObjects(caster.MapPosition + dif);
                     foreach (var obj in objs)
@@ -24,6 +31,7 @@ public class BatCard : Card
                             obj.GetAttacked(caster, 1);
                         }
                     }
+                    caster.Gameplay.RemoveBase(s);
                     NextTurn(repeat);
                 });
             }, () => {
