@@ -98,11 +98,18 @@ public class GameAction
 
     public static GameAction Attack(GameObject caster, int damage)
     {
+        return Attack(caster, damage, null);
+    }
+
+    public static GameAction Attack(GameObject caster, int damage, Action<GameObject> onHit)
+    {
         return new GameAction(() => {
             var targets = caster.GetGameObjects(caster.Facing, 0);
             foreach (GameObject target in targets)
             {
                 target.GetAttacked(caster, damage);
+                if (onHit != null)
+                    onHit(target);
             }
         }, null, null);
     }
@@ -110,36 +117,49 @@ public class GameAction
     public static GameAction Move(GameObject target, Vector2 amount, Func<Vector2, bool> onMove)
     {
         Vector2 targetPosition = new Vector2(0, 0);
+        int i = 1;
         return new GameAction(() => {
-            int i = 1;
-            while (i <= Math.Abs(amount.Y) || i <= Math.Abs(amount.X)) {
-                if (Math.Abs(amount.Y) >= i)
-                {
-                    if (onMove != null && onMove(target.MapPosition + new Vector2(0, Math.Sign(amount.Y))))
-                        break;
+            if (amount.Y < 0)
+                target.MovedUp = true;
+            targetPosition = target.Position;
+        }, () => {
+            if (targetPosition == target.Position)
+            {
+                if (i > Math.Abs(amount.Y) && i > Math.Abs(amount.X))
+                    return true;
+                
+                Vector2 move = new Vector2(i <= Math.Abs(amount.X) ? Math.Sign(amount.X) : 0, i <= Math.Abs(amount.Y) ? Math.Sign(amount.Y) : 0);
 
-                    if (target.CanMove(0, Math.Sign(amount.Y)))
-                    {
-                        target.MapPosition += new Vector2(0, Math.Sign(amount.Y));
-                        if (amount.Y < 0)
-                            target.MovedUp = true;
-                    }
-                }
-                if (Math.Abs(amount.X) >= i)
+                if (onMove != null && onMove(target.MapPosition + move))
+                    return true;
+                
+                if (!target.CanMove((int)move.X, (int)move.Y))
                 {
-                    if (onMove != null && onMove(target.MapPosition + new Vector2(Math.Sign(amount.X), 0)))
-                        break;
-
-                    if (target.CanMove(Math.Sign(amount.X), 0))
+                    var objects = target.GetGameObjects((int)move.X, (int)move.Y);
+                    bool bounce = false;
+                    foreach (GameObject obj in objects)
                     {
-                        target.MapPosition += new Vector2(Math.Sign(amount.X), 0);
+                        if (obj != target)
+                        {
+                            target.Collided?.Invoke(obj);
+                            obj.Collided?.Invoke(target);
+                            if (move.Y > 0)
+                            {
+                                obj.GetAttacked(target, 1);
+                                bounce = true;
+                            }
+                        }
                     }
+                    if (bounce)
+                        target.AddActionNext(GameAction.Move(target, new Vector2(target.Facing, -1), null));
+                    return true;
                 }
+
+                target.MapPosition += move;
+                targetPosition = target.MapPosition * 32;
                 i += 1;
             }
-            targetPosition = target.MapPosition * 32;
-        }, () => {
-            var done = false;
+
             if (target.Position.X < targetPosition.X)
             {
                 target.Position += new Vector2(1, 0);
@@ -148,21 +168,17 @@ public class GameAction
             {
                 target.Position -= new Vector2(1, 0);
             }
-            else
-            {
-                done = true;
-            }
+
             if (target.Position.Y > targetPosition.Y)
             {
                 target.Position -= new Vector2(0, 1);
-                return false;
             }
             else if (target.Position.Y < targetPosition.Y)
             {
                 target.Position += new Vector2(0, 1);
-                return false;
             }
-            else
+            
+            if (target.Position == targetPosition)
             {
                 var objects = target.GetGameObjects(0, 0);
                 foreach (GameObject obj in objects)
@@ -170,11 +186,11 @@ public class GameAction
                     if (obj != target)
                     {
                         target.Collided?.Invoke(obj);
-                        obj.Collided?.Invoke(obj);
+                        obj.Collided?.Invoke(target);
                     }
                 }
-                return done;
             }
+            return false;
         }, null);
     }
 }
@@ -217,6 +233,13 @@ public class GameObject : BaseObject
     public void AddAction(GameAction a)
     {
         _actions.Add(a);
+        if (_actions.Count == 1)
+            RunActions();
+    }
+
+    public void AddActionNext(GameAction a)
+    {
+        _actions.Insert(1, a);
     }
 
     public void RunActions()

@@ -54,6 +54,11 @@ public abstract class Card
         _caster.AddAction(GameAction.Attack(_caster, amount));
     }
 
+    public void Attack(int amount, Action<GameObject> onHit)
+    {
+        _caster.AddAction(GameAction.Attack(_caster, amount, onHit));
+    }
+
     public void FlipDirection()
     {
         _caster.AddAction(GameAction.FlipDirection(_caster));
@@ -113,6 +118,18 @@ public class SideStep : Card
     }
 }
 
+public class HighKick : Card
+{
+    public override void OnCast(GameObject caster, Vector2 direction)
+    {
+        Attack(1, (target) => {
+            For(target, () => {
+                Move(new Vector2(direction.X, -1));
+            });
+        });
+    }
+}
+
 public class DragonKick : Card
 {
     public override void OnCast(GameObject caster, Vector2 direction)
@@ -135,8 +152,7 @@ public class DragonKick : Card
                 foreach (var obj in caster.Gameplay.GetGameObjects(spot))
                 {
                     For(obj, () => {
-                        Move(new Vector2(0, 1));
-                        obj.RunActions();
+                        Move(new Vector2(0, -1));
                     });
                     done = true;
                 }

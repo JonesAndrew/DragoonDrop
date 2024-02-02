@@ -63,8 +63,8 @@ public class Gameplay : GameScreen
             new SideStep(),
             new Dragoon(),
             new Dragoon(),
-            new DragonKick(),
-            new DragonKick(),
+            new HighKick(),
+            new HighKick(),
             new DragonKick(),
         });
         Player = new Player(this, _handManager);
@@ -76,7 +76,7 @@ public class Gameplay : GameScreen
         walker.SetMapPosition(new Vector2(6, 3));
         AddEnemy(walker);
 
-        walker = new Walker(this);
+        walker = new Bat(this);
         walker.SetMapPosition(new Vector2(7, 3));
         AddEnemy(walker);
         
@@ -91,6 +91,11 @@ public class Gameplay : GameScreen
         });
     }
 
+    public void AddObject(BaseObject o)
+    {
+        _objects.Add(o);
+    }
+
     public void AddEnemy(GameObject go)
     {
         _inserts.Add(() => {
@@ -102,7 +107,9 @@ public class Gameplay : GameScreen
 
     public void RemoveBase(BaseObject go)
     {
-        _objects.Remove(go);
+        _inserts.Add(() => {
+            _objects.Remove(go);
+        });
     }
 
     public void Remove(GameObject go)

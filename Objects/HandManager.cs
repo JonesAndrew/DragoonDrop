@@ -60,6 +60,7 @@ public class HandManager : BaseObject
         _deck = _discard;
         _discard = new List<Card>();
         _deck.Shuffle(new Random());
+        Console.WriteLine(_deck.Count);
     }
 
     public override void Update(GameTime gameTime)
@@ -108,6 +109,7 @@ public class HandManager : BaseObject
             else
             {
                 _hand[selected].card.Cast(_gameplay.Player, new Vector2(mp.X < _gameplay.Player.Position.X ? -1 : 1, 0));
+                _discard.Add(_hand[selected].card);
                 _hand.RemoveAt(selected);
                 _gameplay.Player.CastedCard = true;
                 selected = -1;

@@ -40,10 +40,22 @@ public class KnifeThrowerCard : Card
                 });
 
                 var dif = caster.Gameplay.Player.MapPosition - caster.MapPosition;
+                var items = caster.Gameplay.DrawLineNoDiagonalSteps((int)caster.MapPosition.X, (int)caster.MapPosition.Y, (int)caster.MapPosition.X + (int)dif.X, (int)caster.MapPosition.Y + (int)dif.Y);
+                var remove = new List<BaseObject>();
+                foreach (var item in items)
+                {
+                    var spr = new Sprite(caster.Gameplay.Game.SpriteBatch, SpriteLoader.Get("enemy_tiles"), 32, 32, 10);
+                    var s = new SpriteObject(spr);
+                    spr.Frame = 5;
+                    spr.Position = item * 32;
+                    caster.Gameplay.AddObject(s);
+                    remove.Add(s);
+                }
 
                 NextTurn(() => {
                     WaitFor(() => knife.ActionCount == 0 || knife.ShouldRemove());
                     Check(() => caster.StandingOnGround() && catchKnife, () => {
+                        foreach(var o in remove) caster.Gameplay.RemoveBase(o);
                         var items = caster.Gameplay.DrawLineNoDiagonalSteps((int)caster.MapPosition.X, (int)caster.MapPosition.Y, (int)caster.MapPosition.X + (int)dif.X, (int)caster.MapPosition.Y + (int)dif.Y);
                         foreach (var item in items)
                         {
