@@ -20,7 +20,7 @@ public class Health
         _sprite.Frame = 0;
     }
 
-    public void Draw(GameTime gameTime, Vector2 position)
+    public virtual void Draw(GameTime gameTime, Vector2 position)
     {
         for (int i = 0; i < Amount; i++)
         {
@@ -28,5 +28,10 @@ public class Health
             _sprite.Position = position - new Vector2(BaseAmount * 16/2 - (float)(i+0.5) * 16, 10);
             _sprite.Draw(gameTime);
         }
+    }
+
+    public virtual void Damaged(int damage)
+    {
+        Amount -= damage;
     }
 }

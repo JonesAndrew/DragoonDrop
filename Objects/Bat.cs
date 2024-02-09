@@ -22,6 +22,8 @@ public class BatCard : Card
                 spr.Position = player.MapPosition * 32;
                 caster.Gameplay.AddObject(s);
 
+                ((Bat)caster).Enemy.Alerted = true;
+
                 NextTurn(() => {
                     var objs = caster.Gameplay.GetGameObjects(caster.MapPosition + dif);
                     foreach (var obj in objs)
@@ -32,6 +34,7 @@ public class BatCard : Card
                         }
                     }
                     caster.Gameplay.RemoveBase(s);
+                    ((Bat)caster).Enemy.Alerted = false;
                     NextTurn(repeat);
                 });
             }, () => {
@@ -53,12 +56,16 @@ public class BatCard : Card
 public class Bat : GameObject
 {
     private Sprite _sprite;
+    public Enemy Enemy;
 
     public Bat(Gameplay gameplay) : base(gameplay)
     {
         _sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("enemy_tiles"), 32, 32, 10);
         _sprite.Frame = 3;
+
         Health = new Health(gameplay, 2);
+        Enemy = new Enemy(gameplay);
+
         new BatCard().Cast(this, new Vector2(Facing, 0));
         Gravity = false;
     }
@@ -73,6 +80,7 @@ public class Bat : GameObject
         _sprite.Position = Position;
         _sprite.Facing = Facing;
         _sprite.Draw(gameTime);
+        Enemy.Draw(gameTime, Position);
 
         base.Draw(gameTime);
     }

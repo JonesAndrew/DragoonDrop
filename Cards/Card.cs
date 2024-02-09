@@ -11,6 +11,8 @@ public abstract class Card
 
     public string Description = "Hi this is\na card, yup";
 
+    public int Cost = 1;
+
     public void Cast(GameObject caster, Vector2 direction)
     {
         _caster = caster;

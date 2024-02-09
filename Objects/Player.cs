@@ -11,6 +11,7 @@ public class Player : GameObject
     public bool CastedCard { get; set; }
 
     private Sprite _sprite;
+    private AnimationManager _anim;
     public HandManager HandManager;
 
     public Player(Gameplay gameplay, HandManager handManager) : base(gameplay)
@@ -18,13 +19,20 @@ public class Player : GameObject
         _sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("enemy_tiles"), 32, 32, 10);
         _sprite.Frame = 2;
         HandManager = handManager;
-        Health = new Health(gameplay, 3);
+        Health = new PlayerHealth(gameplay, 3, this);
         CastedCard = false;
+        _anim = new AnimationManager(new Dictionary<string, Animation> {
+            {"standing", new Animation {Sprite = _sprite, Frames = new List<int> {2}}}
+        }, "standing");
     }
 
     public override void EndTurn()
     {
         base.EndTurn();
+
+        HandManager.FireLeft = 2;
+        var ph = (PlayerHealth)Health;
+        ph.Frenzy = Math.Max(ph.Frenzy - 1, 0);
 
         if (!CastedCard)
             HandManager.DrawCards(HandManager.MAX_CARDS);
@@ -34,13 +42,15 @@ public class Player : GameObject
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
+
+        _anim.Update();
     }
 
     public override void Draw(GameTime gameTime)
     {
-        _sprite.Position = Position;
-        _sprite.Facing = Facing;
-        _sprite.Draw(gameTime);
+        _anim.Position = Position;
+        _anim.Facing = Facing;
+        _anim.Draw(gameTime);
 
         base.Draw(gameTime);
     }

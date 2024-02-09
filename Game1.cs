@@ -269,6 +269,10 @@ public class Game1 : Game
         SpriteLoader.Load("enemy_tiles", "Content/enemy_tiles.png", GraphicsDevice);
         SpriteLoader.Load("card_frames", "Content/card_frames.png", GraphicsDevice);
         SpriteLoader.Load("heart_ui", "Content/heart_ui.png", GraphicsDevice);
+        SpriteLoader.Load("fire", "Content/fire.png", GraphicsDevice);
+        SpriteLoader.Load("full", "Content/health_full.png", GraphicsDevice);
+        SpriteLoader.Load("empty", "Content/health_empty.png", GraphicsDevice);
+        SpriteLoader.Load("frenzy", "Content/health_frenzy.png", GraphicsDevice);
     }
 
     protected override void Update(GameTime gameTime)

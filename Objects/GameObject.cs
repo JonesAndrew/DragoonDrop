@@ -197,6 +197,7 @@ public class GameAction
 
 public delegate void TurnStarted();
 public delegate void Collided(GameObject target);
+public delegate void DidDamage(GameObject target, int amount);
 
 public class GameObject : BaseObject
 {
@@ -213,6 +214,7 @@ public class GameObject : BaseObject
 
     public TurnStarted TurnStarted;
     public Collided Collided;
+    public DidDamage DidDamage;
 
     private bool _remove = false;
 
@@ -334,7 +336,8 @@ public class GameObject : BaseObject
         if (Health == null)
             return;
         
-        Health.Amount -= damage;
+        Health.Damaged(damage);
+        by.DidDamage?.Invoke(this, damage);
         if (Health.Amount <= 0)
             by.Killed(this);
     }

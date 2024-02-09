@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Screens;
 using MonoGame.Extended.Screens.Transitions;
+using MonoGame.Extended;
+using MonoGame.Extended.ViewportAdapters;
 using System.Collections.Generic;
 using System;
 using System.IO;
@@ -29,9 +31,11 @@ public class Gameplay : GameScreen
     private List<GameObject> _enemies = new List<GameObject>();
     private List<GameObject> _envs = new List<GameObject>();
     private List<Action> _inserts = new List<Action>();
+    private OrthographicCamera _camera;
 
     public InputState LastFrame { get; set; } = new InputState();
     public InputState CurrentFrame { get; set; } = new InputState();
+    public Vector2 MousePosition;
 
     public Player Player { get; set; }
 
@@ -79,7 +83,9 @@ public class Gameplay : GameScreen
         walker = new Bat(this);
         walker.SetMapPosition(new Vector2(7, 3));
         AddEnemy(walker);
-        
+
+        var viewportAdapter = new BoxingViewportAdapter(Game.Window, GraphicsDevice, 400, 240);
+        _camera = new OrthographicCamera(viewportAdapter);
     }
 
     public void AddEnemiesFront(GameObject go)
@@ -159,6 +165,7 @@ public class Gameplay : GameScreen
         LastFrame.MouseState = CurrentFrame.MouseState;
         CurrentFrame.KeyboardState = Keyboard.GetState();
         CurrentFrame.MouseState = Mouse.GetState();
+        MousePosition = _camera.ScreenToWorld(new Vector2(CurrentFrame.MouseState.X, CurrentFrame.MouseState.Y));
 
         _handManager.Update(gameTime);
         _turnManager.Update();
@@ -203,8 +210,10 @@ public class Gameplay : GameScreen
 
     public override void Draw(GameTime gameTime)
     {
+        var transformMatrix = _camera.GetViewMatrix();
+
         Game.GraphicsDevice.Clear(Color.Black);
-        Game.SpriteBatch.Begin();
+        Game.SpriteBatch.Begin(transformMatrix: transformMatrix, samplerState: SamplerState.PointClamp);
 
         foreach (var o in _objects) o.Draw(gameTime);
         _handManager.Draw(gameTime);
