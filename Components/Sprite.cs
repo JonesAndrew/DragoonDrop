@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Screens;
 using MonoGame.Extended.Screens.Transitions;
+using System;
 
 namespace MyGame;
 
@@ -11,6 +12,8 @@ public class Sprite
     public Vector2 Position { get; set; }
     public int Frame { get; set; } = 0;
     public int Facing { get; set; } = 1;
+    public float Angle { get; set; } = 0;
+    public Vector2 Origin { get; set; }
 
     private SpriteBatch _batch;
     private Texture2D _texture;
@@ -30,6 +33,6 @@ public class Sprite
 
     public void Draw(GameTime gameTime)
     {
-        _batch.Draw(_texture, new Vector2((int)Position.X, (int)Position.Y), new Rectangle(Frame % _cols * _width, Frame / _cols * _height, _width, _height), Color.White, 0, new Vector2(0, 0), new Vector2(1, 1), Facing != 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+        _batch.Draw(_texture, new Vector2((int)Position.X, (int)Position.Y), new Rectangle(Frame % _cols * _width, Frame / _cols * _height, _width, _height), Color.White, Angle, Origin, new Vector2(1, 1), Facing != 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
     }
 }

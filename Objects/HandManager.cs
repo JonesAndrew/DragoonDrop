@@ -12,6 +12,7 @@ public class HandManager : BaseObject
 {
     private Sprite _cardSprite;
     private Sprite _fireSprite;
+    private Sprite _arrowSprite;
     private Gameplay _gameplay;
 
     private List<(Card card, Vector2 position)> _hand;
@@ -34,6 +35,9 @@ public class HandManager : BaseObject
     {
         _cardSprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("card_frames"), 64, 64, 10);
         _fireSprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("fire"), 32, 32, 1);
+        _arrowSprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("arrows"), 16, 16, 2);
+        _arrowSprite.Origin = new Vector2(8, 8);
+        _arrowSprite.Angle = 0;
 
         _gameplay = gameplay;
 
@@ -134,6 +138,14 @@ public class HandManager : BaseObject
             var c = _hand[i];
             _cardSprite.Position =  c.position;
             _cardSprite.Draw(gameTime);
+
+            for (int t = 0; t < c.card.Arrows.Count; t++)
+            {
+                _arrowSprite.Position = c.position + new Vector2(32, 32 + t * 16);
+                _arrowSprite.Angle = c.card.Arrows[t].angle * (float)Math.PI / 2;
+                _arrowSprite.Frame = c.card.Arrows[t].frame;
+                _arrowSprite.Draw(gameTime);
+            }
 
             _gameplay.Game.SpriteBatch.DrawString(_gameplay.Game.Font, c.card.GetType().Name, new Vector2((int)c.position.X + 12, (int)c.position.Y - 1), Color.Black);
             _gameplay.Game.SpriteBatch.DrawString(_gameplay.Game.Font, c.card.Description, new Vector2((int)c.position.X + 12, (int)c.position.Y + 10), Color.Black);

@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 
 namespace MyGame;
 
@@ -12,6 +13,8 @@ public abstract class Card
     public string Description = "Hi this is\na card, yup";
 
     public int Cost = 1;
+
+    public List<(int angle, int frame)> Arrows = new List<(int angle, int frame)>();
 
     public void Cast(GameObject caster, Vector2 direction)
     {
@@ -91,6 +94,7 @@ public class Lunge : Card
     public Lunge()
     {
         Cost = 1;
+        Arrows.Add((0, 0));
     }
 
     public override void OnCast(GameObject caster, Vector2 direction)
@@ -105,6 +109,7 @@ public class Knock : Card
     public Knock()
     {
         Cost = 1;
+        Arrows.Add((0, 0));
     }
 
     public override void OnCast(GameObject caster, Vector2 direction)
@@ -119,6 +124,7 @@ public class Dragoon : Card
     public Dragoon()
     {
         Cost = 2;
+        Arrows.Add((-1, 0));
     }
 
     public override void OnCast(GameObject caster, Vector2 direction)
@@ -133,6 +139,7 @@ public class SideStep : Card
     public SideStep()
     {
         Cost = 1;
+        Arrows.Add((0, 0));
     }
 
     public override void OnCast(GameObject caster, Vector2 direction)
@@ -147,6 +154,7 @@ public class HighKick : Card
     public HighKick()
     {
         Cost = 0;
+        Arrows.Add((0, 0));
     }
 
     public override void OnCast(GameObject caster, Vector2 direction)
@@ -164,6 +172,7 @@ public class DragonKick : Card
     public DragonKick()
     {
         Cost = 2;
+        Arrows.Add((1, 1));
     }
 
     public override void OnCast(GameObject caster, Vector2 direction)
