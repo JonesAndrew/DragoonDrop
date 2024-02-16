@@ -38,7 +38,7 @@ public abstract class Card
 
     public void Move(Vector2 amount)
     {
-        _caster.AddAction(GameAction.Move(_caster, amount, null));
+        Move(amount, null);
     }
 
     public void Move(Vector2 amount, Func<Vector2, bool> onMove)
@@ -53,12 +53,14 @@ public abstract class Card
 
     public void Attack(int amount)
     {
-        _caster.AddAction(GameAction.Attack(_caster, amount));
+        Attack(amount, null);
     }
 
     public void Attack(int amount, Action<GameObject> onHit)
     {
+        _caster.AddAction(GameAction.WaitAnimation(_caster, "pre_attack"));
         _caster.AddAction(GameAction.Attack(_caster, amount, onHit));
+        _caster.AddAction(GameAction.WaitAnimation(_caster, "post_attack"));
     }
 
     public void FlipDirection()
@@ -86,6 +88,11 @@ public abstract class Card
 
 public class Lunge : Card
 {
+    public Lunge()
+    {
+        Cost = 1;
+    }
+
     public override void OnCast(GameObject caster, Vector2 direction)
     {
         Move(new Vector2(direction.X * 2, 0));
@@ -95,6 +102,11 @@ public class Lunge : Card
 
 public class Knock : Card
 {
+    public Knock()
+    {
+        Cost = 1;
+    }
+
     public override void OnCast(GameObject caster, Vector2 direction)
     {
         Attack(1);
@@ -104,6 +116,11 @@ public class Knock : Card
 
 public class Dragoon : Card
 {
+    public Dragoon()
+    {
+        Cost = 2;
+    }
+
     public override void OnCast(GameObject caster, Vector2 direction)
     {
         Move(new Vector2(0, -3));
@@ -113,6 +130,11 @@ public class Dragoon : Card
 
 public class SideStep : Card
 {
+    public SideStep()
+    {
+        Cost = 1;
+    }
+
     public override void OnCast(GameObject caster, Vector2 direction)
     {
         Move(new Vector2(direction.X, 0));
@@ -122,9 +144,14 @@ public class SideStep : Card
 
 public class HighKick : Card
 {
+    public HighKick()
+    {
+        Cost = 0;
+    }
+
     public override void OnCast(GameObject caster, Vector2 direction)
     {
-        Attack(1, (target) => {
+        Attack(0, (target) => {
             For(target, () => {
                 Move(new Vector2(direction.X, -1));
             });
@@ -134,6 +161,11 @@ public class HighKick : Card
 
 public class DragonKick : Card
 {
+    public DragonKick()
+    {
+        Cost = 2;
+    }
+
     public override void OnCast(GameObject caster, Vector2 direction)
     {
         Check(() => caster.StandingOnGround(), () => {

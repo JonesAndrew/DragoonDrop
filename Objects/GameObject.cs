@@ -101,6 +101,22 @@ public class GameAction
         return Attack(caster, damage, null);
     }
 
+    public static GameAction PlayAnimaiton(GameObject caster, string anim)
+    {
+        return new GameAction(() => {
+            caster.PlayAnimaiton(anim);
+        }, null, null);
+    }
+
+    public static GameAction WaitAnimation(GameObject caster, string anim)
+    {
+        return new GameAction(() => {
+            caster.PlayAnimaiton(anim);
+        }, () => {
+            return caster.IsAnimationDone(anim);
+        }, null);
+    }
+
     public static GameAction Attack(GameObject caster, int damage, Action<GameObject> onHit)
     {
         return new GameAction(() => {
@@ -163,19 +179,23 @@ public class GameAction
             if (target.Position.X < targetPosition.X)
             {
                 target.Position += new Vector2(1, 0);
+                target.PlayAnimaiton("move");
             }
             else if (target.Position.X > targetPosition.X)
             {
                 target.Position -= new Vector2(1, 0);
+                target.PlayAnimaiton("move");
             }
 
             if (target.Position.Y > targetPosition.Y)
             {
                 target.Position -= new Vector2(0, 1);
+                target.PlayAnimaiton("jump");
             }
             else if (target.Position.Y < targetPosition.Y)
             {
                 target.Position += new Vector2(0, 1);
+                target.PlayAnimaiton("fall");
             }
             
             if (target.Position == targetPosition)
@@ -283,7 +303,10 @@ public class GameObject : BaseObject
         {
             MovedUp = false;
         }
-        else if (Gravity) AddAction(GameAction.Move(this, new Vector2(0, 1), null));
+        else if (Gravity)
+        {
+            AddAction(GameAction.Move(this, new Vector2(0, 1), null));
+        }
     }
 
     // public bool CanMove(Vector2 target)
@@ -329,6 +352,15 @@ public class GameObject : BaseObject
 
     public virtual void Killed(GameObject target)
     {
+    }
+
+    public virtual void PlayAnimaiton(string anim)
+    {
+    }
+
+    public virtual bool IsAnimationDone(string anim)
+    {
+        return true;
     }
 
     public void GetAttacked(GameObject by, int damage)

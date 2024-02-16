@@ -273,6 +273,15 @@ public class Game1 : Game
         SpriteLoader.Load("full", "Content/health_full.png", GraphicsDevice);
         SpriteLoader.Load("empty", "Content/health_empty.png", GraphicsDevice);
         SpriteLoader.Load("frenzy", "Content/health_frenzy.png", GraphicsDevice);
+        SpriteLoader.Load("ahead", "Content/Dragoon/spearAttackAhead.png", GraphicsDevice);
+        SpriteLoader.Load("up", "Content/Dragoon/spearAttackUpGrounded.png", GraphicsDevice);
+        SpriteLoader.Load("slide", "Content/Dragoon/slide.png", GraphicsDevice);
+        SpriteLoader.Load("fall", "Content/Dragoon/fallNormal.png", GraphicsDevice);
+        SpriteLoader.Load("jump", "Content/Dragoon/jump.png", GraphicsDevice);
+        SpriteLoader.Load("cursor", "Content/mouse.png", GraphicsDevice);
+        SpriteLoader.Load("arrows", "Content/cardArrows.png", GraphicsDevice);
+
+        Mouse.SetCursor(MouseCursor.FromTexture2D(SpriteLoader.Get("cursor"), 16, 16));
     }
 
     protected override void Update(GameTime gameTime)

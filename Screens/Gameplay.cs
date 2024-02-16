@@ -72,7 +72,7 @@ public class Gameplay : GameScreen
             new DragonKick(),
         });
         Player = new Player(this, _handManager);
-        Player.SetMapPosition(new Vector2(1, 3));
+        Player.SetMapPosition(new Vector2(1, 4));
         _gameObjects.Add(Player);
         _objects.Add(Player);  
 
@@ -187,6 +187,8 @@ public class Gameplay : GameScreen
 
         var items = new List<Vector2>();
 
+        int checkOther = 0;
+
         for (;;) {
             items.Add(new Vector2(x0, y0));
             Console.WriteLine("" + x0 + " " + y0);
@@ -196,12 +198,14 @@ public class Gameplay : GameScreen
             e2 = 2 * err;
 
             // EITHER horizontal OR vertical step (but not both!)
-            if (e2 > dy) { 
+            if (e2 > dy && (checkOther < Math.Abs(dy) || e2 >= dx)) { 
                 err += dy;
                 x0 += sx;
+                checkOther += Math.Abs(dx);
             } else if (e2 < dx) { // <--- this "else" makes the difference
                 err += dx;
                 y0 += sy;
+                checkOther -= Math.Abs(dy);
             }
         }
 

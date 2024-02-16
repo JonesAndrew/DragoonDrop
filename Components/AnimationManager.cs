@@ -13,6 +13,7 @@ public class Animation
     public Sprite Sprite;
     public List<int> Frames;
     public Vector2 Offset = new Vector2(0, 0);
+    public Vector2 Pivot = new Vector2(0, 0);
     public int Speed = 6;
 }
 
@@ -36,13 +37,26 @@ public class AnimationManager
         Frame += 1;
     }
 
+    public bool IsAnimationDone()
+    {
+        var a = Animations[Current];
+        return Frame / a.Speed > a.Frames.Count - 1;
+    }
+
+    public void PlayAnimaiton(string anim)
+    {
+        Current = anim;
+        Frame = 0;
+    }
+
     public void Draw(GameTime gameTime)
     {
         var a = Animations[Current];
         var f = a.Frames[Math.Min(a.Frames.Count - 1, Frame / a.Speed)];
         
-        a.Sprite.Position = Position + new Vector2(a.Offset.X * Facing, a.Offset.Y);
+        a.Sprite.Position = Position + a.Pivot + new Vector2(a.Offset.X * Facing, a.Offset.Y);
         a.Sprite.Facing = Facing;
+        a.Sprite.Frame = f;
         a.Sprite.Draw(gameTime);
     }
 }

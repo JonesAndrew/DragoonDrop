@@ -18,7 +18,7 @@ public class WalkerCard : Card
                 }, () => {
                     Check(() => !caster.CanMove(caster.Facing, 0), () => {
                         FlipDirection();
-                        Move(new Vector2(-caster.Facing, 0));
+                        //Move(new Vector2(-caster.Facing, 0));
                     }, () => {
                         Move(new Vector2(caster.Facing, 0));
                     });

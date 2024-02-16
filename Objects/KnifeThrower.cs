@@ -40,23 +40,14 @@ public class KnifeThrowerCard : Card
                 });
 
                 var dif = caster.Gameplay.Player.MapPosition - caster.MapPosition;
-                var items = caster.Gameplay.DrawLineNoDiagonalSteps((int)caster.MapPosition.X, (int)caster.MapPosition.Y, (int)caster.MapPosition.X + (int)dif.X, (int)caster.MapPosition.Y + (int)dif.Y);
-                var remove = new List<BaseObject>();
-                foreach (var item in items)
-                {
-                    var spr = new Sprite(caster.Gameplay.Game.SpriteBatch, SpriteLoader.Get("enemy_tiles"), 32, 32, 10);
-                    var s = new SpriteObject(spr);
-                    spr.Frame = 5;
-                    spr.Position = item * 32;
-                    caster.Gameplay.AddObject(s);
-                    remove.Add(s);
-                }
+                ((KnifeThrower)caster).DrawingDiff = dif;
+                ((KnifeThrower)caster).Drawing = true;
 
                 NextTurn(() => {
                     WaitFor(() => knife.ActionCount == 0 || knife.ShouldRemove());
+                    ((KnifeThrower)caster).Drawing = false;
                     Check(() => caster.StandingOnGround() && catchKnife, () => {
-                        foreach(var o in remove) caster.Gameplay.RemoveBase(o);
-                        var items = caster.Gameplay.DrawLineNoDiagonalSteps((int)caster.MapPosition.X, (int)caster.MapPosition.Y, (int)caster.MapPosition.X + (int)dif.X, (int)caster.MapPosition.Y + (int)dif.Y);
+                        var items = caster.Gameplay.DrawLineNoDiagonalSteps((int)caster.MapPosition.X, (int)caster.MapPosition.Y, (int)caster.MapPosition.X + (int)dif.X * 10, (int)caster.MapPosition.Y + (int)dif.Y * 10);
                         foreach (var item in items)
                         {
                             if (caster.Gameplay.IsWall(item))
@@ -114,6 +105,8 @@ public class Knife : GameObject
 public class KnifeThrower : GameObject
 {
     private Sprite _sprite;
+    public Vector2 DrawingDiff;
+    public bool Drawing = false;
 
     public KnifeThrower(Gameplay gameplay) : base(gameplay)
     {
@@ -130,10 +123,75 @@ public class KnifeThrower : GameObject
 
     public override void Draw(GameTime gameTime)
     {
+        if (Drawing)
+        {
+            Vector2 target = MapPosition;
+            var items = Gameplay.DrawLineNoDiagonalSteps((int)MapPosition.X, (int)MapPosition.Y, (int)MapPosition.X + (int)DrawingDiff.X * 10, (int)MapPosition.Y + (int)DrawingDiff.Y * 10);
+            foreach (var item in items)
+            {
+                target = item * 32;
+
+                if (Gameplay.IsWall(item))
+                    break;
+
+                var objs = Gameplay.GetGameObjects(item);
+                var done = false;
+                foreach (var obj in objs)
+                {
+                    if (obj != this)
+                    {
+                        done = true;
+                    }
+                }
+                if (done)
+                    break;
+            }
+            var ddif = DrawingDiff / DrawingDiff.Length();
+            var dif = target - (Position);
+            var mag = Vector2.Dot(dif, ddif);
+            DrawLineBetween(Gameplay.Game.SpriteBatch, Position + new Vector2(16, 16), new Vector2(16, 16) + Position + ddif * mag, 3, Microsoft.Xna.Framework.Color.White);
+        }
+
         _sprite.Position = Position;
         _sprite.Facing = Facing;
         _sprite.Draw(gameTime);
 
         base.Draw(gameTime);
+    }
+
+    public static void DrawLineBetween(
+        SpriteBatch spriteBatch,
+        Vector2 startPos,
+        Vector2 endPos,
+        int thickness,
+        Microsoft.Xna.Framework.Color color)
+    {
+        // Create a texture as wide as the distance between two points and as high as
+        // the desired thickness of the line.
+        var distance = Math.Max((int)Vector2.Distance(startPos, endPos), 1);
+        var texture = new Texture2D(spriteBatch.GraphicsDevice, distance, thickness);
+
+        // Fill texture with given color.
+        var data = new Color[distance * thickness];
+        for (int i = 0; i < data.Length; i++)
+        {
+            data[i] = color;
+        }
+        texture.SetData(data);
+
+        // Rotate about the beginning middle of the line.
+        var rotation = (float)Math.Atan2(endPos.Y - startPos.Y, endPos.X - startPos.X);
+        var origin = new Vector2(0, thickness / 2);
+
+        spriteBatch.Draw(
+            texture,
+            startPos,
+            null,
+            Color.White,
+            rotation,
+            origin,
+            1.0f,
+            SpriteEffects.None,
+            1.0f);
     }
 }
