@@ -191,7 +191,6 @@ public class Gameplay : GameScreen
 
         for (;;) {
             items.Add(new Vector2(x0, y0));
-            Console.WriteLine("" + x0 + " " + y0);
 
             if (x0 == x1 && y0 == y1) break;
 

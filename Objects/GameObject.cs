@@ -108,10 +108,10 @@ public class GameAction
         }, null, null);
     }
 
-    public static GameAction WaitAnimation(GameObject caster, string anim)
+    public static GameAction WaitAnimation(GameObject caster, string anim, bool repeat=false)
     {
         return new GameAction(() => {
-            caster.PlayAnimaiton(anim);
+            caster.PlayAnimaiton(anim, repeat);
         }, () => {
             return caster.IsAnimationDone(anim);
         }, null);
@@ -148,24 +148,30 @@ public class GameAction
 
                 if (onMove != null && onMove(target.MapPosition + move))
                     return true;
+
+                var objects = target.GetGameObjects((int)move.X, (int)move.Y);
+                bool bounce = false;
+                foreach (GameObject obj in objects)
+                {
+                    if (obj != target)
+                    {
+                        target.Collided?.Invoke(obj);
+                        obj.Collided?.Invoke(target);
+                        if (move.Y > 0 && !target.CanMove((int)move.X, (int)move.Y))
+                        {
+                            obj.GetAttacked(target, 1);
+                            bounce = true;
+                        }
+                    }
+                }
+
+                if (target.Gameplay.IsWall(target.MapPosition + move))
+                {
+                    target.Collided?.Invoke(null);
+                }
                 
                 if (!target.CanMove((int)move.X, (int)move.Y))
                 {
-                    var objects = target.GetGameObjects((int)move.X, (int)move.Y);
-                    bool bounce = false;
-                    foreach (GameObject obj in objects)
-                    {
-                        if (obj != target)
-                        {
-                            target.Collided?.Invoke(obj);
-                            obj.Collided?.Invoke(target);
-                            if (move.Y > 0)
-                            {
-                                obj.GetAttacked(target, 1);
-                                bounce = true;
-                            }
-                        }
-                    }
                     if (bounce)
                         target.AddActionNext(GameAction.Move(target, new Vector2(target.Facing, -1), null));
                     return true;
@@ -179,23 +185,23 @@ public class GameAction
             if (target.Position.X < targetPosition.X)
             {
                 target.Position += new Vector2(1, 0);
-                target.PlayAnimaiton("move");
+                target.PlayAnimaiton(target.MoveAnimation, true);
             }
             else if (target.Position.X > targetPosition.X)
             {
                 target.Position -= new Vector2(1, 0);
-                target.PlayAnimaiton("move");
+                target.PlayAnimaiton(target.MoveAnimation, true);
             }
 
             if (target.Position.Y > targetPosition.Y)
             {
                 target.Position -= new Vector2(0, 1);
-                target.PlayAnimaiton("jump");
+                target.PlayAnimaiton(target.JumpAnimation);
             }
             else if (target.Position.Y < targetPosition.Y)
             {
                 target.Position += new Vector2(0, 1);
-                target.PlayAnimaiton("fall");
+                target.PlayAnimaiton(target.FallAnimation);
             }
             
             if (target.Position == targetPosition)
@@ -221,6 +227,10 @@ public delegate void DidDamage(GameObject target, int amount);
 
 public class GameObject : BaseObject
 {
+    public string MoveAnimation = "move";
+    public string FallAnimation = "fall";
+    public string JumpAnimation = "jump";
+
     public Vector2 MapPosition { get; set; }
     public Vector2 Position { get; set; }
     public int Facing { get; set; }
@@ -354,7 +364,7 @@ public class GameObject : BaseObject
     {
     }
 
-    public virtual void PlayAnimaiton(string anim)
+    public virtual void PlayAnimaiton(string anim, bool repeat=false)
     {
     }
 

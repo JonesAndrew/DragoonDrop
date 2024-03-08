@@ -10,14 +10,11 @@ public class Player : GameObject
 {
     public bool CastedCard { get; set; }
 
-    private Sprite _sprite;
     private AnimationManager _anim;
     public HandManager HandManager;
 
     public Player(Gameplay gameplay, HandManager handManager) : base(gameplay)
     {
-        _sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("enemy_tiles"), 32, 32, 10);
-        _sprite.Frame = 2;
         HandManager = handManager;
         Health = new PlayerHealth(gameplay, 3, this);
         CastedCard = false;
@@ -37,7 +34,7 @@ public class Player : GameObject
     {
         base.EndTurn();
 
-        HandManager.FireLeft = 2;
+        HandManager.FireLeft = 3;
         var ph = (PlayerHealth)Health;
         ph.Frenzy = Math.Max(ph.Frenzy - 1, 0);
 
@@ -62,9 +59,10 @@ public class Player : GameObject
         Health.Draw(gameTime, Position - new Vector2(4, 8));
     }
 
-    public override void PlayAnimaiton(string anim)
+    public override void PlayAnimaiton(string anim, bool repeat=false)
     {
         _anim.PlayAnimaiton(anim);
+        _anim.Repeat = repeat;
     }
 
     public override bool IsAnimationDone(string anim)

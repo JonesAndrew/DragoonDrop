@@ -281,6 +281,12 @@ public class Game1 : Game
         SpriteLoader.Load("cursor", "Content/mouse.png", GraphicsDevice);
         SpriteLoader.Load("arrows", "Content/cardArrows.png", GraphicsDevice);
 
+        SpriteLoader.Load("bat_flap", "Content/Bat/bat_flap.png", GraphicsDevice);
+        SpriteLoader.Load("bat_prep", "Content/Bat/bat_ready_sonic_attack.png", GraphicsDevice);
+        SpriteLoader.Load("bat_attack", "Content/Bat/bat_sonic_attack.png", GraphicsDevice);
+
+        SpriteLoader.Load("rouge", "Content/Rogue/rogue_strip.png", GraphicsDevice);
+
         Mouse.SetCursor(MouseCursor.FromTexture2D(SpriteLoader.Get("cursor"), 16, 16));
     }
 

@@ -23,7 +23,7 @@ public class KnifeThrowerCard : Card
                     {
                         catchKnife = true;
                     }
-                    else
+                    else if (with != null)
                     {
                         with.GetAttacked(knife, 1);
                     }
@@ -34,7 +34,7 @@ public class KnifeThrowerCard : Card
                     Move(new Vector2(0, -2));
                     NextTurn(() => {
                         For(knife, () => {
-                            Move(new Vector2(0, 2));
+                            Move(new Vector2(0, 10));
                         });
                     });
                 });
@@ -110,8 +110,8 @@ public class KnifeThrower : GameObject
 
     public KnifeThrower(Gameplay gameplay) : base(gameplay)
     {
-        _sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("enemy_tiles"), 32, 32, 10);
-        _sprite.Frame = 4;
+        _sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("rouge"), 48, 48, 10);
+        _sprite.Frame = 0;
         Health = new Health(gameplay, 2);
         new KnifeThrowerCard().Cast(this, new Vector2(Facing, 0));
     }
@@ -152,7 +152,7 @@ public class KnifeThrower : GameObject
             DrawLineBetween(Gameplay.Game.SpriteBatch, Position + new Vector2(16, 16), new Vector2(16, 16) + Position + ddif * mag, 3, Microsoft.Xna.Framework.Color.White);
         }
 
-        _sprite.Position = Position;
+        _sprite.Position = Position - new Vector2(8, 16);
         _sprite.Facing = Facing;
         _sprite.Draw(gameTime);
 

@@ -22,7 +22,7 @@ public class HandManager : BaseObject
     int hovering = -1;
     int selected = -1;
 
-    public int FireLeft = 2;
+    public int FireLeft = 3;
 
     public const int MAX_CARDS = 7;
 

@@ -24,7 +24,10 @@ public class BatCard : Card
 
                 ((Bat)caster).Enemy.Alerted = true;
 
+                caster.AddAction(GameAction.WaitAnimation(caster, "pre_attack", true));
+
                 NextTurn(() => {
+                    caster.AddAction(GameAction.WaitAnimation(caster, "post_attack"));
                     var objs = caster.Gameplay.GetGameObjects(caster.MapPosition + dif);
                     foreach (var obj in objs)
                     {
@@ -55,13 +58,21 @@ public class BatCard : Card
 
 public class Bat : GameObject
 {
-    private Sprite _sprite;
+    private AnimationManager _anim;
     public Enemy Enemy;
 
     public Bat(Gameplay gameplay) : base(gameplay)
     {
-        _sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("enemy_tiles"), 32, 32, 10);
-        _sprite.Frame = 3;
+        JumpAnimation = "standing";
+        MoveAnimation = "standing";
+        FallAnimation = "standing";
+
+        _anim = new AnimationManager(new Dictionary<string, Animation> {
+            {"standing", new Animation {Pivot = new Vector2(0, 0), Offset = new Vector2(0, 0), Sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("bat_flap"), 32, 32, 8), Frames = new List<int> {0, 1, 2, 3, 4, 5, 6, 7}}},
+            {"pre_attack", new Animation {Pivot = new Vector2(0, 0), Offset = new Vector2(0, 0), Sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("bat_prep"), 32, 32, 2), Frames = new List<int> {0, 1}}},
+            {"post_attack", new Animation {Pivot = new Vector2(0, 0), Offset = new Vector2(0, 0), Sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("bat_attack"), 32, 32, 2), Frames = new List<int> {0, 1}}},
+        }, "standing");
+        _anim.Repeat = true;
 
         Health = new Health(gameplay, 2);
         Enemy = new Enemy(gameplay);
@@ -75,11 +86,29 @@ public class Bat : GameObject
         base.StartTurn();
     }
 
+    public override void PlayAnimaiton(string anim, bool repeat=false)
+    {
+        _anim.PlayAnimaiton(anim);
+        _anim.Repeat = repeat;
+    }
+
+    public override bool IsAnimationDone(string anim)
+    {
+        return _anim.Current == anim && _anim.IsAnimationDone();
+    }
+
+    public override void Update(GameTime gameTime)
+    {
+        base.Update(gameTime);
+
+        _anim.Update();
+    }
+
     public override void Draw(GameTime gameTime)
     {
-        _sprite.Position = Position;
-        _sprite.Facing = Facing;
-        _sprite.Draw(gameTime);
+        _anim.Position = Position;
+        _anim.Facing = Facing;
+        _anim.Draw(gameTime);
         Enemy.Draw(gameTime, Position);
 
         base.Draw(gameTime);
