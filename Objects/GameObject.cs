@@ -139,8 +139,9 @@ public class GameAction
                 target.MovedUp = true;
             targetPosition = target.Position;
         }, () => {
-            if (targetPosition == target.Position)
+            if (Vector2.Distance(target.Position, targetPosition) < 0.05)
             {
+                target.Position = targetPosition;
                 if (i > Math.Abs(amount.Y) && i > Math.Abs(amount.X))
                     return true;
                 
@@ -184,27 +185,27 @@ public class GameAction
 
             if (target.Position.X < targetPosition.X)
             {
-                target.Position += new Vector2(1, 0);
-                target.PlayAnimaiton(target.MoveAnimation, true);
+                target.Position += new Vector2(32/12.0f, 0);
+                //target.PlayAnimaiton(target.MoveAnimation, true);
             }
             else if (target.Position.X > targetPosition.X)
             {
-                target.Position -= new Vector2(1, 0);
-                target.PlayAnimaiton(target.MoveAnimation, true);
+                target.Position -= new Vector2(32/12.0f, 0);
+                //target.PlayAnimaiton(target.MoveAnimation, true);
             }
 
             if (target.Position.Y > targetPosition.Y)
             {
-                target.Position -= new Vector2(0, 1);
-                target.PlayAnimaiton(target.JumpAnimation);
+                target.Position -= new Vector2(0, 32/12.0f);
+                //target.PlayAnimaiton(target.JumpAnimation);
             }
             else if (target.Position.Y < targetPosition.Y)
             {
-                target.Position += new Vector2(0, 1);
-                target.PlayAnimaiton(target.FallAnimation);
+                target.Position += new Vector2(0, 32/12.0f);
+                //target.PlayAnimaiton(target.FallAnimation);
             }
             
-            if (target.Position == targetPosition)
+            if (Vector2.Distance(target.Position, targetPosition) < 0.05)
             {
                 var objects = target.GetGameObjects(0, 0);
                 foreach (GameObject obj in objects)

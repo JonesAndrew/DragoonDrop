@@ -57,12 +57,12 @@ public class Gameplay : GameScreen
 
         _turnManager = new TurnManager(this);
         _handManager = new HandManager(this, new List<Card> { 
-            new Knock(), 
-            new Knock(), 
             new Lunge(), 
             new Lunge(), 
-            new SideStep(), 
-            new SideStep(), 
+            new Lunge(), 
+            new Lunge(), 
+            new Lunge(), 
+            new Lunge(), 
             new SideStep(), 
             new SideStep(),
             new Dragoon(),

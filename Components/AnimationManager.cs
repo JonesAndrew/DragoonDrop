@@ -59,7 +59,8 @@ public class AnimationManager
         var a = Animations[Current];
         var f = a.Frames[Math.Min(a.Frames.Count - 1, Repeat ? (Frame / a.Speed) % a.Frames.Count : (Frame / a.Speed))];
         
-        a.Sprite.Position = Position + a.Pivot + new Vector2(a.Offset.X * Facing, a.Offset.Y);
+        a.Sprite.Position = Position;
+        a.Sprite.Origin = a.Pivot;
         a.Sprite.Facing = Facing;
         a.Sprite.Frame = f;
         a.Sprite.Draw(gameTime);

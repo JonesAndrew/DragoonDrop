@@ -99,8 +99,11 @@ public class Lunge : Card
 
     public override void OnCast(GameObject caster, Vector2 direction)
     {
+        caster.AddAction(GameAction.WaitAnimation(caster, "pre_lunge"));
+        caster.AddAction(GameAction.PlayAnimaiton(caster, "move_lunge"));
         Move(new Vector2(direction.X * 2, 0));
-        Attack(1);
+        caster.AddAction(GameAction.WaitAnimation(caster, "post_lunge"));
+        //Attack(1);
     }
 }
 

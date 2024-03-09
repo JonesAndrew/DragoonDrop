@@ -280,6 +280,7 @@ public class Game1 : Game
         SpriteLoader.Load("jump", "Content/Dragoon/jump.png", GraphicsDevice);
         SpriteLoader.Load("cursor", "Content/mouse.png", GraphicsDevice);
         SpriteLoader.Load("arrows", "Content/cardArrows.png", GraphicsDevice);
+        SpriteLoader.Load("lunge", "Content/Dragoon/lungeStrip.png", GraphicsDevice);
 
         SpriteLoader.Load("bat_flap", "Content/Bat/bat_flap.png", GraphicsDevice);
         SpriteLoader.Load("bat_prep", "Content/Bat/bat_ready_sonic_attack.png", GraphicsDevice);
