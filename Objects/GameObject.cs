@@ -185,23 +185,23 @@ public class GameAction
 
             if (target.Position.X < targetPosition.X)
             {
-                target.Position += new Vector2(32/12.0f, 0);
+                target.Position += new Vector2(32/9.0f, 0);
                 //target.PlayAnimaiton(target.MoveAnimation, true);
             }
             else if (target.Position.X > targetPosition.X)
             {
-                target.Position -= new Vector2(32/12.0f, 0);
+                target.Position -= new Vector2(32/9.0f, 0);
                 //target.PlayAnimaiton(target.MoveAnimation, true);
             }
 
             if (target.Position.Y > targetPosition.Y)
             {
-                target.Position -= new Vector2(0, 32/12.0f);
+                target.Position -= new Vector2(0, 32/9.0f);
                 //target.PlayAnimaiton(target.JumpAnimation);
             }
             else if (target.Position.Y < targetPosition.Y)
             {
-                target.Position += new Vector2(0, 32/12.0f);
+                target.Position += new Vector2(0, 32/9.0f);
                 //target.PlayAnimaiton(target.FallAnimation);
             }
             
