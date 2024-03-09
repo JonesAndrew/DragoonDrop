@@ -99,29 +99,13 @@ public class Lunge : Card
 
     public override void OnCast(GameObject caster, Vector2 direction)
     {
-        int i = 0;
         caster.AddAction(GameAction.WaitAnimation(caster, "pre_lunge"));
-        caster.AddAction(new GameAction(() => caster.Position += direction * 15, null, null));
-        caster.AddAction(GameAction.PlayAnimaiton(caster, "move_lunge1"));
-        caster.AddAction(new GameAction(() => i = 0, () => {
-            i += 1;
-            if (i == 3) caster.Position += direction * 16;
-            return i >= 6;
-        }, null));
-        caster.AddAction(new GameAction(() => caster.Position += direction * 6, null, null));
-        caster.AddAction(GameAction.PlayAnimaiton(caster, "move_lunge2"));
-        caster.AddAction(new GameAction(() => i = 0, () => {
-            i += 1;
-            if (i == 3) caster.Position += direction * 6;
-            return i >= 6;
-        }, null));
-        caster.AddAction(new GameAction(() => caster.Position += direction * 10, null, null));
-        caster.AddAction(GameAction.PlayAnimaiton(caster, "move_lunge3"));
-        caster.AddAction(new GameAction(() => i = 0, () => {
-            i += 1;
-            if (i == 3) caster.Position += direction * 11;
-            return i >= 6;
-        }, null));
+        caster.AddAction(new GameAction(() => caster.Position += direction * 31, null, null));
+        caster.AddAction(GameAction.WaitAnimation(caster, "move_lunge1"));
+        caster.AddAction(new GameAction(() => caster.Position += direction * 12, null, null));
+        caster.AddAction(GameAction.WaitAnimation(caster, "move_lunge2"));
+        caster.AddAction(new GameAction(() => caster.Position += direction * 21, null, null));
+        caster.AddAction(GameAction.WaitAnimation(caster, "move_lunge3"));
         caster.AddAction(GameAction.WaitAnimation(caster, "post_lunge"));
         //Attack(1);
     }
