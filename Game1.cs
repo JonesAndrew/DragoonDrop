@@ -189,6 +189,10 @@ public class Game1 : Game
     protected override void Initialize()
     {
         // TODO: Add your initialization logic here
+        _graphics.IsFullScreen = false;
+        _graphics.PreferredBackBufferWidth = 400 * 3;
+        _graphics.PreferredBackBufferHeight = 240 * 3;
+        _graphics.ApplyChanges();
 
         base.Initialize();
         _screenManager.LoadScreen(new Gameplay(this), new FadeTransition(GraphicsDevice, Color.Black));
