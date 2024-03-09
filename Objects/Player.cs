@@ -27,7 +27,9 @@ public class Player : GameObject
             {"pre_attack", new Animation {Pivot = new Vector2(24, 32), Sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("ahead"), 80, 48, 9), Frames = new List<int> {0, 1, 2}}},
             {"post_attack", new Animation {Pivot = new Vector2(24, 32), Sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("ahead"), 80, 48, 9), Frames = new List<int> {3, 4, 5, 6, 7, 8}}},
             {"pre_lunge", new Animation {Pivot = new Vector2(48, 16), Sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("lunge"), 96, 32, 13), Frames = new List<int> {0, 1, 2, 3, 4}}},
-            {"move_lunge", new Animation {Pivot = new Vector2(48, 16), Sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("lunge"), 96, 32, 13), Frames = new List<int> {5, 6, 7}}},
+            {"move_lunge1", new Animation {Pivot = new Vector2(48, 16), Sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("lunge"), 96, 32, 13), Frames = new List<int> {5}}},
+            {"move_lunge2", new Animation {Pivot = new Vector2(48, 16), Sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("lunge"), 96, 32, 13), Frames = new List<int> {6}}},
+            {"move_lunge3", new Animation {Pivot = new Vector2(48, 16), Sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("lunge"), 96, 32, 13), Frames = new List<int> {7}}},
             {"post_lunge", new Animation {Pivot = new Vector2(48, 16), Sprite = new Sprite(gameplay.Game.SpriteBatch, SpriteLoader.Get("lunge"), 96, 32, 13), Frames = new List<int> {8, 9, 10, 11, 12}}},
         }, "up");
         Facing = 1;
